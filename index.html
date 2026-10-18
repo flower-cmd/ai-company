@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏢 口袋學霸 Q 版 AI 股份有限公司</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- 載入 KaTeX 數學公式渲染引擎，解決 $...$ 顯示成原始碼的問題 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #f4efe6;
+      background-image: radial-gradient(#d6cbb9 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .office-floor {
+      background: linear-gradient(180deg, #e8dfd1 0%, #f5efe6 35%, #ede3d2 100%);
+      border: 4px solid #5c4938;
+      box-shadow: 0 12px 0 #5c4938, 0 20px 30px rgba(0,0,0,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hallway-carpet {
+      background: repeating-linear-gradient(
+        90deg,
+        #d97757,
+        #d97757 24px,
+        #c86446 24px,
+        #c86446 48px
+      );
+      border-top: 3px solid #8c3d25;
+      border-bottom: 3px solid #8c3d25;
+    }
+
+    @keyframes idle-bounce {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes work-typing {
+      0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+      25% { transform: translateY(-7px) rotate(-4deg) scale(1.04); }
+      75% { transform: translateY(-5px) rotate(4deg) scale(1.04); }
+    }
+
+    @keyframes courier-walk {
+      0%, 100% { transform: translateY(0px) rotate(-5deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
+    }
+
+    .chibi-idle { animation: idle-bounce 2.4s infinite ease-in-out; }
+    .chibi-working { animation: work-typing 0.45s infinite ease-in-out; }
+    .courier-walking { animation: courier-walk 0.35s infinite ease-in-out; }
+
+    .desk-card {
+      border: 3px solid #4a3b2c;
+      box-shadow: 0 6px 0 #4a3b2c;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .desk-active {
+      transform: translateY(-6px);
+      border-color: #d97706;
+      box-shadow: 0 10px 0 #b45309, 0 0 25px rgba(251, 191, 36, 0.6);
+    }
+
+    .desk-done {
+      border-color: #16a34a;
+      box-shadow: 0 6px 0 #15803d;
+    }
+
+    .desk-reject {
+      border-color: #dc2626;
+      box-shadow: 0 6px 0 #b91c1c, 0 0 20px rgba(239, 68, 68, 0.5);
+    }
+
+    #office-courier {
+      transition: left 1.3s cubic-bezier(0.45, 0.05, 0.55, 0.95), opacity 0.25s ease;
+    }
+
+    /* Markdown 與 KaTeX 手機版排版美化 */
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+      font-weight: 800;
+      color: #292524;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .markdown-body p {
+      margin-bottom: 0.6rem;
+      line-height: 1.75;
+    }
+    .markdown-body ul, .markdown-body ol {
+      padding-left: 1.4rem;
+      margin-bottom: 0.75rem;
+      list-style: disc;
+    }
+    .markdown-body li {
+      margin-bottom: 0.35rem;
+      line-height: 1.7;
+    }
+    .markdown-body pre {
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 0.85rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      font-size: 0.85rem;
+    }
+    .markdown-body code {
+      background: #f1f5f9;
+      color: #be123c;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.9em;
+    }
+    .markdown-body pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+    .markdown-body blockquote {
+      border-left: 4px solid #f59e0b;
+      background: #fffbeb;
+      padding: 0.5rem 0.85rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      margin: 0.6rem 0;
+    }
+    /* 防止手機上長數學公式撐破版面 */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.25rem 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-stone-800 pb-16">
+
+  <!-- ================= 頂部公司招牌與 API 設定列 ================= -->
+  <header class="bg-amber-900 text-amber-50 border-b-4 border-stone-900 sticky top-0 z-50 shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl md:text-3xl">🏢</span>
+        <div>
+          <h1 class="font-black text-base md:text-xl tracking-wide flex flex-wrap items-center gap-2">
+            口袋學霸 Q 版 AI 公司
+            <span class="bg-amber-400 text-stone-900 text-[11px] px-2 py-0.5 rounded-full font-extrabold border border-stone-900">
+              手機 & GitHub Pages 支援版
+            </span>
+          </h1>
+          <p class="text-[11px] md:text-xs text-amber-200">物理隔離盲測 × Python 驗算 × LaTeX 數學公式美化</p>
+        </div>
+      </div>
+
+      <!-- 狀態儀表與 API Key 輸入 -->
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+        <div class="bg-stone-800 border-2 border-amber-400 rounded-xl px-2.5 py-1 text-xs flex items-center gap-1.5">
+          <span>📊 API：</span>
+          <strong id="api-counter" class="text-amber-300 text-sm">0</strong>
+          <span>次</span>
+        </div>
+
+        <div class="flex items-center bg-stone-800 border-2 border-stone-600 rounded-xl p-1 flex-1 sm:flex-initial">
+          <span class="text-xs px-1.5 text-amber-200 shrink-0">🔑 Key:</span>
+          <input
+            id="api-key-input"
+            type="password"
+            placeholder="貼上 Gemini API Key..."
+            class="bg-stone-900 text-amber-100 text-xs px-2 py-1 rounded border border-stone-700 focus:outline-none focus:border-amber-400 w-full sm:w-44"
+          />
+          <button
+            onclick="saveApiKey()"
+            class="ml-1 bg-amber-400 hover:bg-amber-300 text-stone-900 font-bold text-xs px-2.5 py-1 rounded transition shrink-0"
+          >
+            儲存
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-3 md:px-4 mt-5 space-y-6">
+
+    <!-- ================= 1. 老闆任務發佈台 (CEO Console) ================= -->
+    <section class="bg-white rounded-2xl p-4 md:p-5 desk-card">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">👑</span>
+          <h2 class="font-black text-base md:text-lg text-stone-800">董事長任務發佈台（輸入你想複習的內容）</h2>
+        </div>
+        <!-- 快速範例主題標籤 -->
+        <div class="flex flex-wrap gap-1.5 text-xs">
+          <button onclick="setPresetTopic('cache')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold px-2.5 py-1 rounded-full border border-amber-400 transition">
+            計組：Cache AMAT
+          </button>
+          <button onclick="setPresetTopic('os')" class="bg-blue-100 hover:bg-blue-200 text-blue-900 font-semibold px-2.5 py-1 rounded-full border border-blue-400 transition">
+            OS：TLB EMAT
+          </button>
+          <button onclick="setPresetTopic('algo')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-semibold px-2.5 py-1 rounded-full border border-emerald-400 transition">
+            演算法：Master Theorem
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 items-stretch">
+        <div class="md:col-span-3">
+          <textarea
+            id="topic-input"
+            rows="3"
+            class="w-full rounded-xl border-2 border-stone-400 p-3 text-sm font-medium focus:outline-none focus:border-amber-600 bg-amber-50/40"
+            placeholder="請輸入你想請 AI 員工整理並出題驗算的主題..."
+          >計算機組織：快取記憶體 (Cache Memory) 的平均記憶體存取時間 (AMAT) 計算、兩階層快取 (L1 + L2) 的 Local Miss Rate vs Global Miss Rate 陷阱，以及 Write-Through 與 Write-Back 對記憶體頻寬的影響。</textarea>
+        </div>
+
+        <div class="flex flex-col justify-between gap-2">
+          <button
+            id="publish-btn"
+            onclick="publishAndStartTask()"
+            class="w-full h-full bg-amber-500 hover:bg-amber-400 active:translate-y-1 text-stone-900 font-black text-base rounded-xl border-3 border-stone-900 shadow-[0_5px_0_#292524] transition flex flex-col items-center justify-center py-3 px-4 cursor-pointer"
+          >
+            <span class="text-xl md:text-2xl mb-0.5">📢 發佈學習任務</span>
+            <span class="text-xs font-bold text-stone-800">更新看板並呼叫員工開工</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 動態更新的 STUDY_TOPIC 看板 -->
+      <div class="mt-4 bg-stone-900 text-amber-100 rounded-xl p-3 border-2 border-amber-500 flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5">
+        <div class="flex items-start gap-2">
+          <span class="bg-amber-400 text-stone-900 font-black text-xs px-2 py-0.5 rounded shrink-0 mt-0.5">
+            STUDY_TOPIC
+          </span>
+          <p id="active-study-topic" class="text-xs md:text-sm font-bold text-amber-300 leading-relaxed">
+            計算機組織：快取記憶體 (Cache Memory) 的平均記憶體存取時間 (AMAT) 計算、兩階層快取 (L1 + L2) 的 Local Miss Rate vs Global Miss Rate 陷阱，以及 Write-Through 與 Write-Back 對記憶體頻寬的影響。
+          </p>
+        </div>
+        <div class="shrink-0 flex items-center gap-2 text-xs text-stone-300 bg-stone-800 px-3 py-1 rounded-lg border border-stone-700 self-end md:self-center">
+          <span>🔄 狀態：</span>
+          <strong id="round-indicator" class="text-amber-400">待機中</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2. Q版辦公室實況舞台 (2D Chibi Office) ================= -->
+    <section class="office-floor rounded-3xl p-4 md:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3 border-b-2 border-stone-400/60">
+        <div class="flex items-center gap-2 bg-white/90 border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 shadow-sm">
+          <span class="text-lg animate-pulse">🎙️</span>
+          <span id="office-broadcast" class="text-xs md:text-sm font-bold text-stone-800">
+            全體員工待命中！請董事長在上方輸入學習主題並按下「發佈學習任務」。
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2.5 bg-sky-50 border-2 border-sky-800 rounded-full px-3.5 py-1">
+          <span class="text-base">🚰</span>
+          <div class="text-xs">
+            <div class="font-bold text-sky-950 flex items-center gap-2">
+              <span>防爆茶水間</span>
+              <span id="cooldown-text" class="text-sky-700 font-extrabold">就緒</span>
+            </div>
+            <div class="w-28 md:w-36 h-2 bg-sky-200 rounded-full overflow-hidden mt-0.5 border border-sky-400">
+              <div id="cooldown-bar" class="h-full bg-sky-500 transition-all duration-200" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 位 Q 版員工座位區 (手機上 2x2 排列，電腦上 1x4 排列) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 relative z-10">
+
+        <!-- 員工 1 -->
+        <div id="desk-1" class="desk-card bg-amber-50 rounded-2xl p-3 md:p-4 flex flex-col items-center text-center relative">
+          <span class="bg-amber-200 text-amber-950 font-black text-[11px] px-2 py-0.5 rounded border border-amber-700 self-start">
+            1號桌 · 筆記部
+          </span>
+          <span class="absolute top-3 right-2.5 text-[10px] font-mono bg-stone-200 px-1.5 py-0.5 rounded text-stone-700" id="model-badge-1">
+            Flash-Lite
+          </span>
+          <div id="bubble-1" class="mt-2 mb-1 bg-white border-2 border-stone-800 rounded-xl px-2 py-1 text-[11px] md:text-xs font-bold text-stone-700 shadow-sm min-h-[34px] flex items-center justify-center w-full">
+            ☕ 等待老闆發佈主題...
+          </div>
+          <div id="avatar-1" class="chibi-idle my-1">
+            <svg width="74" height="74" viewBox="0 0 100 100">
+              <rect x="28" y="58" width="44" height="32" rx="14" fill="#f59e0b" stroke="#292524" stroke-width="3.5"/>
+              <polygon points="50,60 45,75 50,82 55,75" fill="#ef4444" stroke="#292524" stroke-width="2"/>
+              <circle cx="50" cy="38" r="24" fill="#fde68a" stroke="#292524" stroke-width="3.5"/>
+              <path d="M26,34 Q50,12 74,34 Q65,18 35,18 Z" fill="#451a03" stroke="#292524" stroke-width="3"/>
+              <circle cx="41" cy="39" r="6" fill="#ffffff" stroke="#292524" stroke-width="2.5"/>
+              <circle cx="59" cy="39" r="6" fill="#ffffff" stroke="#292524" stroke-width="2.5"/>
+              <line x1="47" y1="39" x2="53" y2="39" stroke="#292524" stroke-width="2.5"/>
+              <circle cx="41" cy="39" r="2.5" fill="#292524"/>
+              <circle cx="59" cy="39" r="2.5" fill="#292524"/>
+              <path d="M45,47 Q50,52 55,47" fill="none" stroke="#292524" stroke-width="2.5" stroke-linecap="round"/>
+              <rect x="34" y="72" width="32" height="18" rx="3" fill="#94a3b8" stroke="#292524" stroke-width="3"/>
+              <circle cx="50" cy="81" r="2.5" fill="#f8fafc"/>
+            </svg>
+          </div>
+          <h3 class="font-black text-sm md:text-base text-stone-900">📝 濃縮員 小米</h3>
+          <p class="text-[11px] text-stone-600">30 秒口袋字卡提煉</p>
+        </div>
+
+        <!-- 員工 2 -->
+        <div id="desk-2" class="desk-card bg-rose-50 rounded-2xl p-3 md:p-4 flex flex-col items-center text-center relative">
+          <span class="bg-rose-200 text-rose-950 font-black text-[11px] px-2 py-0.5 rounded border border-rose-700 self-start">
+            2號桌 · 命題部
+          </span>
+          <span class="absolute top-3 right-2.5 text-[10px] font-mono bg-stone-200 px-1.5 py-0.5 rounded text-stone-700" id="model-badge-2">
+            Flash
+          </span>
+          <div id="bubble-2" class="mt-2 mb-1 bg-white border-2 border-stone-800 rounded-xl px-2 py-1 text-[11px] md:text-xs font-bold text-stone-700 shadow-sm min-h-[34px] flex items-center justify-center w-full">
+            😈 等小米送字卡過來...
+          </div>
+          <div id="avatar-2" class="chibi-idle my-1">
+            <svg width="74" height="74" viewBox="0 0 100 100">
+              <path d="M28,22 L20,8 L38,18 Z" fill="#e11d48" stroke="#292524" stroke-width="3"/>
+              <path d="M72,22 L80,8 L62,18 Z" fill="#e11d48" stroke="#292524" stroke-width="3"/>
+              <rect x="28" y="58" width="44" height="32" rx="14" fill="#be123c" stroke="#292524" stroke-width="3.5"/>
+              <circle cx="50" cy="38" r="24" fill="#fde68a" stroke="#292524" stroke-width="3.5"/>
+              <line x1="35" y1="33" x2="45" y2="37" stroke="#292524" stroke-width="3" stroke-linecap="round"/>
+              <line x1="65" y1="33" x2="55" y2="37" stroke="#292524" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="41" cy="40" r="3" fill="#292524"/>
+              <circle cx="59" cy="40" r="3" fill="#292524"/>
+              <path d="M42,48 Q50,55 58,47" fill="none" stroke="#292524" stroke-width="2.5" stroke-linecap="round"/>
+              <rect x="34" y="72" width="32" height="18" rx="3" fill="#334155" stroke="#292524" stroke-width="3"/>
+              <text x="50" y="84" text-anchor="middle" fill="#fb7185" font-size="10" font-weight="bold">😈</text>
+            </svg>
+          </div>
+          <h3 class="font-black text-sm md:text-base text-stone-900">😈 出題官 凱撒</h3>
+          <p class="text-[11px] text-stone-600">陷阱命題與嚴格拆卷</p>
+        </div>
+
+        <!-- 員工 3 -->
+        <div id="desk-3" class="desk-card bg-emerald-50 rounded-2xl p-3 md:p-4 flex flex-col items-center text-center relative">
+          <span class="bg-emerald-200 text-emerald-950 font-black text-[11px] px-2 py-0.5 rounded border border-emerald-700 self-start">
+            3號桌 · 盲測室
+          </span>
+          <span class="absolute top-3 right-2.5 text-[10px] font-mono bg-emerald-700 text-white px-1.5 py-0.5 rounded" id="model-badge-3">
+            🐍 Python
+          </span>
+          <div id="bubble-3" class="mt-2 mb-1 bg-white border-2 border-stone-800 rounded-xl px-2 py-1 text-[11px] md:text-xs font-bold text-stone-700 shadow-sm min-h-[34px] flex items-center justify-center w-full">
+            🕵️ 隔離中，等題目卷...
+          </div>
+          <div id="avatar-3" class="chibi-idle my-1">
+            <svg width="74" height="74" viewBox="0 0 100 100">
+              <rect x="28" y="58" width="44" height="32" rx="14" fill="#059669" stroke="#292524" stroke-width="3.5"/>
+              <circle cx="50" cy="38" r="24" fill="#fde68a" stroke="#292524" stroke-width="3.5"/>
+              <ellipse cx="50" cy="18" rx="28" ry="7" fill="#78350f" stroke="#292524" stroke-width="3"/>
+              <path d="M30,18 Q50,2 70,18 Z" fill="#92400e" stroke="#292524" stroke-width="3"/>
+              <circle cx="41" cy="39" r="3" fill="#292524"/>
+              <circle cx="60" cy="39" r="7" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/>
+              <line x1="65" y1="44" x2="73" y2="52" stroke="#0284c7" stroke-width="3.5" stroke-linecap="round"/>
+              <circle cx="60" cy="39" r="2.5" fill="#292524"/>
+              <path d="M45,49 L54,49" stroke="#292524" stroke-width="2.5" stroke-linecap="round"/>
+              <rect x="34" y="72" width="32" height="18" rx="3" fill="#1e293b" stroke="#292524" stroke-width="3"/>
+              <text x="50" y="84" text-anchor="middle" fill="#34d399" font-size="9" font-family="monospace">py&gt;</text>
+            </svg>
+          </div>
+          <h3 class="font-black text-sm md:text-base text-stone-900">🕵️ 盲測員 柯南</h3>
+          <p class="text-[11px] text-stone-600">無答案 Python 驗算</p>
+        </div>
+
+        <!-- 員工 4 -->
+        <div id="desk-4" class="desk-card bg-purple-50 rounded-2xl p-3 md:p-4 flex flex-col items-center text-center relative">
+          <span class="bg-purple-200 text-purple-950 font-black text-[11px] px-2 py-0.5 rounded border border-purple-700 self-start">
+            4號桌 · 終審部
+          </span>
+          <span class="absolute top-3 right-2.5 text-[10px] font-mono bg-stone-200 px-1.5 py-0.5 rounded text-stone-700" id="model-badge-4">
+            Flash
+          </span>
+          <div id="bubble-4" class="mt-2 mb-1 bg-white border-2 border-stone-800 rounded-xl px-2 py-1 text-[11px] md:text-xs font-bold text-stone-700 shadow-sm min-h-[34px] flex items-center justify-center w-full">
+            ⚖️ 準備交叉核對算式...
+          </div>
+          <div id="avatar-4" class="chibi-idle my-1">
+            <svg width="74" height="74" viewBox="0 0 100 100">
+              <rect x="28" y="58" width="44" height="32" rx="14" fill="#6d28d9" stroke="#292524" stroke-width="3.5"/>
+              <circle cx="50" cy="38" r="24" fill="#fcd34d" stroke="#292524" stroke-width="3.5"/>
+              <rect x="32" y="8" width="36" height="14" rx="4" fill="#1e1b4b" stroke="#292524" stroke-width="3"/>
+              <rect x="18" y="13" width="14" height="5" rx="2" fill="#1e1b4b" stroke="#292524" stroke-width="2.5"/>
+              <rect x="68" y="13" width="14" height="5" rx="2" fill="#1e1b4b" stroke="#292524" stroke-width="2.5"/>
+              <path d="M47,26 A4,4 0 1,0 53,30 A3,3 0 1,1 47,26 Z" fill="#fef08a"/>
+              <line x1="34" y1="34" x2="45" y2="36" stroke="#292524" stroke-width="3" stroke-linecap="round"/>
+              <line x1="66" y1="34" x2="55" y2="36" stroke="#292524" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="41" cy="40" r="3" fill="#292524"/>
+              <circle cx="59" cy="40" r="3" fill="#292524"/>
+              <path d="M44,49 Q50,46 56,49" fill="none" stroke="#292524" stroke-width="2.5" stroke-linecap="round"/>
+              <rect x="34" y="72" width="32" height="18" rx="3" fill="#4c1d95" stroke="#292524" stroke-width="3"/>
+              <text x="50" y="84" text-anchor="middle" fill="#fde08a" font-size="10" font-weight="bold">⚖️</text>
+            </svg>
+          </div>
+          <h3 class="font-black text-sm md:text-base text-stone-900">⚖️ 糾察長 包大人</h3>
+          <p class="text-[11px] text-stone-600">算錯退件 · 吻合才簽核</p>
+        </div>
+
+      </div>
+
+      <!-- 辦公室走廊與跑腿交接小人 -->
+      <div class="mt-7 pt-4 relative">
+        <div class="hallway-carpet h-9 rounded-full w-full flex items-center justify-between px-4 md:px-8 text-amber-100/90 text-[11px] md:text-xs font-bold">
+          <span>📍 1號站</span>
+          <span>📍 2號站</span>
+          <span>🔒 隔離牆</span>
+          <span>📍 3號站</span>
+          <span>📍 4號站</span>
+        </div>
+
+        <div
+          id="office-courier"
+          class="absolute -top-6 flex flex-col items-center pointer-events-none opacity-0"
+          style="left: 8%;"
+        >
+          <div id="courier-badge" class="bg-amber-300 text-stone-900 border-2 border-stone-900 font-black text-[11px] px-2 py-0.5 rounded-full shadow-md whitespace-nowrap mb-0.5">
+            📒 傳遞字卡中...
+          </div>
+          <div class="courier-walking text-2xl md:text-3xl filter drop-shadow">
+            🏃‍♂️📄
+          </div>
+        </div>
+      </div>
+
+      <!-- 辦公室即時任務紀錄 Log -->
+      <div class="mt-4 bg-stone-900/95 text-stone-200 rounded-xl p-3 border-2 border-stone-700 text-xs font-mono max-h-32 overflow-y-auto" id="office-log">
+        <div class="text-amber-400">✨ [系統就緒] 已啟用 KaTeX 數學公式美化與手機離線字卡櫃！</div>
+      </div>
+    </section>
+
+    <!-- ================= 3. 成果驗收與做題區 (Boss Desk Output) ================= -->
+    <section id="result-section" class="bg-white rounded-3xl p-4 md:p-6 desk-card hidden">
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b-2 border-stone-200">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl md:text-3xl">📬</span>
+          <div>
+            <h2 class="font-black text-lg md:text-xl text-stone-900 flex flex-wrap items-center gap-2">
+              員工呈交成果報告
+              <span id="final-status-badge" class="text-xs px-2.5 py-0.5 rounded-full font-black border-2"></span>
+            </h2>
+            <p class="text-xs text-stone-500">數學公式已透過 KaTeX 自動美化排版，並已自動存入下方「手機歷史字卡櫃」</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            onclick="copyMarkdown()"
+            class="bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs px-3 py-2 rounded-xl border-2 border-stone-800 transition cursor-pointer"
+          >
+            📋 複製筆記
+          </button>
+          <button
+            onclick="downloadMarkdown()"
+            class="bg-emerald-500 hover:bg-emerald-400 text-stone-900 font-black text-xs px-3.5 py-2 rounded-xl border-2 border-stone-900 shadow-[0_3px_0_#1c1917] transition cursor-pointer"
+          >
+            💾 下載 .md 檔
+          </button>
+        </div>
+      </div>
+
+      <!-- 三大成果區塊 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
+        <!-- 左欄：一、口袋記憶卡 -->
+        <div class="bg-amber-50/70 rounded-2xl p-4 md:p-5 border-2 border-amber-300">
+          <div class="flex items-center gap-2 mb-3 pb-2 border-b border-amber-200">
+            <span class="text-xl">📇</span>
+            <h3 class="font-black text-base text-amber-950">一、口袋記憶卡（30 秒極速複習）</h3>
+          </div>
+          <div id="output-pocket-note" class="markdown-body text-sm text-stone-800"></div>
+        </div>
+
+        <!-- 右欄：二、實戰陷阱題 (純題目卷) -->
+        <div class="bg-rose-50/60 rounded-2xl p-4 md:p-5 border-2 border-rose-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-rose-200">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">✍️</span>
+                <h3 class="font-black text-base text-rose-950">二、實戰陷阱題（純題目卷）</h3>
+              </div>
+              <span class="bg-rose-200 text-rose-900 text-xs font-bold px-2 py-0.5 rounded">無答案防劇透</span>
+            </div>
+            <div id="output-question-only" class="markdown-body text-sm text-stone-800"></div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-rose-200 flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-bold text-rose-800">💡 先在心裡選好 (A)(B)(C)(D)，再點按鈕對答案！</span>
+            <button
+              id="toggle-solution-btn"
+              onclick="toggleSolution()"
+              class="w-full sm:w-auto bg-stone-900 hover:bg-stone-700 text-amber-300 font-black text-xs px-4 py-2.5 rounded-xl transition cursor-pointer"
+            >
+              👁️ 揭曉雙重認證詳解與驗算紀錄
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下方隱藏區：三、雙重認證詳解與 Python 盲測驗算紀錄 -->
+      <div id="solution-drawer" class="mt-6 hidden space-y-5 pt-4 border-t-2 border-dashed border-stone-300">
+        <div class="bg-purple-50 rounded-2xl p-4 border-2 border-purple-300">
+          <h4 class="font-black text-sm text-purple-950 mb-2 flex items-center gap-2">
+            <span>⚖️</span> 糾察長包大人簽核報告
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="bg-white p-3 rounded-xl border border-purple-200">
+              <strong class="text-purple-900 block mb-1">🔹 答案一致性比對：</strong>
+              <span id="audit-consistency" class="text-stone-700"></span>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-purple-200">
+              <strong class="text-purple-900 block mb-1">🔹 題幹條件嚴謹度：</strong>
+              <span id="audit-rigor" class="text-stone-700"></span>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-purple-200">
+              <strong class="text-purple-900 block mb-1">🔹 最終裁決總結：</strong>
+              <span id="audit-feedback" class="text-stone-700"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="bg-stone-50 rounded-2xl p-4 md:p-5 border-2 border-stone-300">
+            <h4 class="font-black text-sm text-stone-900 mb-3 pb-2 border-b border-stone-200">
+              😈 1. 出題官標準詳解
+            </h4>
+            <div id="output-author-solution" class="markdown-body text-sm text-stone-800"></div>
+          </div>
+
+          <div class="bg-emerald-50/60 rounded-2xl p-4 md:p-5 border-2 border-emerald-300">
+            <h4 class="font-black text-sm text-emerald-950 mb-3 pb-2 border-b border-emerald-200">
+              🕵️ 2. 盲測員獨立解題 & Python 驗算紀錄
+            </h4>
+            <div id="output-blind-solution" class="markdown-body text-sm text-stone-800"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 4. 手機離線歷史字卡櫃 (Saved Flashcards) ================= -->
+    <section class="bg-white rounded-2xl p-4 md:p-5 desk-card">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📚</span>
+          <h2 class="font-black text-base md:text-lg text-stone-800">手機離線字卡檔案櫃（自動儲存過去生成的主題）</h2>
+        </div>
+        <button
+          onclick="clearHistory()"
+          class="text-xs text-stone-400 hover:text-red-600 font-bold transition"
+        >
+          🗑️ 清空紀錄
+        </button>
+      </div>
+      <div id="history-list" class="flex flex-wrap gap-2 text-xs text-stone-500">
+        尚未有歷史字卡紀錄，發佈任務完成後會自動保存在這裡！
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =====================================================================
+    // 1. 全域設定與模型備援清單
+    // =====================================================================
+    const FALLBACK_LITE = ["gemini-3.5-flash-lite", "gemini-2.5-flash-lite", "gemini-2.5-flash"];
+    const FALLBACK_MAIN = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-3.5-flash-lite"];
+
+    const MAX_RETRIES = 2;
+    const COOLDOWN_SECONDS = 4;
+
+    let apiCallCount = 0;
+    let latestMarkdownContent = "";
+    let isRunning = false;
+
+    const PRESET_TOPICS = {
+      cache: "計算機組織：快取記憶體 (Cache Memory) 的平均記憶體存取時間 (AMAT) 計算、兩階層快取 (L1 + L2) 的 Local Miss Rate vs Global Miss Rate 陷阱，以及 Write-Through 與 Write-Back 對記憶體頻寬的影響。",
+      os: "作業系統：虛擬記憶體分頁 (Paging) 與 TLB (Translation Lookaside Buffer) 的有效記憶體存取時間 (EMAT) 計算、Page Fault 處理流程，以及 Belady's Anomaly 在 FIFO 替換演算法中的陷阱。",
+      algo: "演算法與離散數學：Master Theorem (主定理) 三種 Case 的漸進複雜度判定條件、常見無法直接套用的對數陷阱，以及 Dynamic Programming 與 Divide-and-Conquer 的本質差異。"
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedKey = localStorage.getItem("POCKET_COMPANY_GEMINI_KEY");
+      if (savedKey) {
+        document.getElementById("api-key-input").value = savedKey;
+        appendLog("🔑 已從瀏覽器載入您儲存的 Gemini API Key。");
+      }
+      renderHistoryList();
+    });
+
+    function saveApiKey() {
+      const key = document.getElementById("api-key-input").value.trim();
+      if (!key) {
+        alert("請先貼上有效的 Gemini API Key！");
+        return;
+      }
+      localStorage.setItem("POCKET_COMPANY_GEMINI_KEY", key);
+      appendLog("✅ API Key 已安全儲存於本機瀏覽器！");
+      setBroadcast("🔑 API Key 儲存成功！現在可以用手機或電腦隨時發佈學習任務！");
+    }
+
+    function setPresetTopic(key) {
+      if (isRunning) return;
+      const topic = PRESET_TOPICS[key];
+      document.getElementById("topic-input").value = topic;
+      document.getElementById("active-study-topic").textContent = topic;
+      setBroadcast("📌 已切換預設考點主題，點擊「📢 發佈學習任務」即可開工！");
+    }
+
+    // =====================================================================
+    // 2. Markdown + KaTeX 數學公式完美渲染器 (解決 $...$ 原始碼問題)
+    // =====================================================================
+    function renderMarkdownWithMath(elementId, rawText) {
+      const container = document.getElementById(elementId);
+      if (!container) return;
+
+      let text = rawText || "";
+      const mathSegments = [];
+
+      // 先把 $$...$$ 與 $...$ 保護起來，避免被 marked.js 把下標 _1 轉成斜體 <em>
+      text = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
+        const id = `@@MATH_BLOCK_${mathSegments.length}@@`;
+        mathSegments.push({ id, math: math.trim(), display: true });
+        return id;
+      });
+
+      text = text.replace(/\$([^\$\n]+?)\$/g, (_, math) => {
+        const id = `@@MATH_INLINE_${mathSegments.length}@@`;
+        mathSegments.push({ id, math: math.trim(), display: false });
+        return id;
+      });
+
+      // 解析 Markdown
+      let html = window.marked ? window.marked.parse(text) : text.replace(/\n/g, "<br>");
+
+      // 將保護的數學公式透過 KaTeX 渲染為漂亮 HTML
+      for (const seg of mathSegments) {
+        let renderedMath = seg.math;
+        if (window.katex) {
+          try {
+            renderedMath = window.katex.renderToString(seg.math, {
+              displayMode: seg.display,
+              throwOnError: false
+            });
+          } catch (e) {
+            renderedMath = `<code>${seg.math}</code>`;
+          }
+        }
+        html = html.replace(seg.id, renderedMath);
+      }
+
+      container.innerHTML = html;
+    }
+
+    // =====================================================================
+    // 3. 辦公室 UI 動畫與跑腿交接控制
+    // =====================================================================
+    function appendLog(msg) {
+      const logBox = document.getElementById("office-log");
+      const timeStr = new Date().toLocaleTimeString();
+      const div = document.createElement("div");
+      div.className = "py-0.5 border-b border-stone-800";
+      div.textContent = `[${timeStr}] ${msg}`;
+      logBox.appendChild(div);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function setBroadcast(msg) {
+      document.getElementById("office-broadcast").textContent = msg;
+    }
+
+    function setDeskState(deskNum, state, bubbleText, modelBadgeText = null) {
+      const desk = document.getElementById(`desk-${deskNum}`);
+      const avatar = document.getElementById(`avatar-${deskNum}`);
+      const bubble = document.getElementById(`bubble-${deskNum}`);
+
+      desk.classList.remove("desk-active", "desk-done", "desk-reject");
+      avatar.classList.remove("chibi-idle", "chibi-working");
+
+      if (state === "working") {
+        desk.classList.add("desk-active");
+        avatar.classList.add("chibi-working");
+      } else if (state === "done") {
+        desk.classList.add("desk-done");
+        avatar.classList.add("chibi-idle");
+      } else if (state === "reject") {
+        desk.classList.add("desk-reject");
+        avatar.classList.add("chibi-working");
+      } else {
+        avatar.classList.add("chibi-idle");
+      }
+
+      if (bubbleText) bubble.textContent = bubbleText;
+      if (modelBadgeText) {
+        document.getElementById(`model-badge-${deskNum}`).textContent = modelBadgeText;
+      }
+    }
+
+    async function walkAndDeliver(fromDesk, toDesk, itemLabel, isReject = false) {
+      const positions = { 1: "8%", 2: "33%", 3: "60%", 4: "82%" };
+      const courier = document.getElementById("office-courier");
+      const badge = document.getElementById("courier-badge");
+
+      badge.textContent = itemLabel;
+      badge.className = isReject
+        ? "bg-red-600 text-white border-2 border-stone-900 font-black text-[11px] px-2 py-0.5 rounded-full shadow-md whitespace-nowrap mb-0.5"
+        : "bg-amber-300 text-stone-900 border-2 border-stone-900 font-black text-[11px] px-2 py-0.5 rounded-full shadow-md whitespace-nowrap mb-0.5";
+
+      courier.style.transition = "none";
+      courier.style.left = positions[fromDesk];
+      courier.style.opacity = "1";
+
+      await new Promise((r) => setTimeout(r, 60));
+      courier.style.transition = "left 1.25s cubic-bezier(0.45, 0.05, 0.55, 0.95), opacity 0.25s ease";
+      courier.style.left = positions[toDesk];
+
+      await new Promise((r) => setTimeout(r, 1300));
+      courier.style.opacity = "0";
+    }
+
+    async function cooldownSleep(deskNum) {
+      apiCallCount++;
+      document.getElementById("api-counter").textContent = apiCallCount;
+      const bar = document.getElementById("cooldown-bar");
+      const text = document.getElementById("cooldown-text");
+
+      setDeskState(deskNum, "done", `🧋 喝水防爆冷卻 (${COOLDOWN_SECONDS}s)...`);
+      appendLog(`⏳ [防爆茶水間] 已累計呼叫 ${apiCallCount} 次 API，冷卻 ${COOLDOWN_SECONDS} 秒...`);
+
+      const steps = 20;
+      const stepTime = (COOLDOWN_SECONDS * 1000) / steps;
+      for (let i = 1; i <= steps; i++) {
+        const pct = Math.round((i / steps) * 100);
+        bar.style.width = `${pct}%`;
+        text.textContent = `${(COOLDOWN_SECONDS - (i * COOLDOWN_SECONDS) / steps).toFixed(1)}s`;
+        await new Promise((r) => setTimeout(r, stepTime));
+      }
+      bar.style.width = "0%";
+      text.textContent = "就緒";
+    }
+
+    // =====================================================================
+    // 4. 具備 503 自動跨模型備援的 Gemini API 呼叫核心
+    // =====================================================================
+    async function callGeminiWithFallback({
+      deskNum,
+      fallbackModels,
+      systemInstruction,
+      userPrompt,
+      temperature = 0.2,
+      responseSchema = null,
+      useCodeExecution = false
+    }) {
+      const apiKey = document.getElementById("api-key-input").value.trim();
+      if (!apiKey) {
+        throw new Error("請先在右上角輸入你的 Gemini API Key！");
+      }
+
+      let lastError = null;
+
+      for (let mIdx = 0; mIdx < fallbackModels.length; mIdx++) {
+        const currentModel = fallbackModels[mIdx];
+        setDeskState(deskNum, "working", null, currentModel.replace("gemini-", ""));
+
+        if (mIdx > 0) {
+          const msg = `🔀 [自動備援] 原模型塞車，${deskNum}號桌自動切換至 ${currentModel}！`;
+          appendLog(msg);
+          setBroadcast(msg);
+        }
+
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          try {
+            const payload = {
+              systemInstruction: { parts: [{ text: systemInstruction }] },
+              contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+              generationConfig: { temperature }
+            };
+
+            if (responseSchema) {
+              payload.generationConfig.responseMimeType = "application/json";
+              payload.generationConfig.responseSchema = responseSchema;
+            }
+
+            if (useCodeExecution) {
+              payload.tools = [{ code_execution: {} }];
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${encodeURIComponent(apiKey)}`;
+            const res = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+              const errText = await res.text();
+              throw new Error(`HTTP ${res.status}: ${errText}`);
+            }
+
+            const data = await res.json();
+            await cooldownSleep(deskNum);
+            return data;
+
+          } catch (err) {
+            lastError = err;
+            const errMsg = String(err.message || err);
+            const isOverloaded =
+              errMsg.includes("503") ||
+              errMsg.includes("429") ||
+              errMsg.includes("UNAVAILABLE") ||
+              errMsg.includes("404");
+
+            if (isOverloaded) {
+              const waitSec = attempt * 4;
+              appendLog(`⚠️ [${currentModel} 塞車/限流] 等待 ${waitSec} 秒後重試或切換備援...`);
+              setDeskState(deskNum, "working", `⚠️ 塞車中，${waitSec}s 後換備援...`);
+              await new Promise((r) => setTimeout(r, waitSec * 1000));
+            } else {
+              appendLog(`❌ [${currentModel}] 發生錯誤：${errMsg}`);
+              break;
+            }
+          }
+        }
+      }
+
+      throw new Error(`所有備援模型皆無法回應：${lastError ? lastError.message : "未知錯誤"}`);
+    }
+
+    function extractPartsText(data) {
+      const parts = data?.candidates?.[0]?.content?.parts || [];
+      const output = [];
+      for (const part of parts) {
+        if (part.text) {
+          output.push(part.text);
+        } else if (part.executableCode) {
+          output.push(`\n\`\`\`python\n${part.executableCode.code}\n\`\`\`\n`);
+        } else if (part.codeExecutionResult) {
+          output.push(`\n> 🐍 **Python 驗算輸出**：\n> \`${(part.codeExecutionResult.output || "").trim()}\`\n`);
+        }
+      }
+      return output.join("\n").trim();
+    }
+
+    // =====================================================================
+    // 5. 四位 Q 版 AI 員工的工作邏輯
+    // =====================================================================
+    async function runAgentDistiller(topic) {
+      setDeskState(1, "working", "📝 正在濃縮 30 秒口袋字卡...");
+      setBroadcast("📝 【1號桌 小米】正在將主題提煉成「口袋記憶卡」...");
+      appendLog("📝 [員工 1：濃縮員小米] 開始提煉重點字卡...");
+
+      const systemInstruction = `
+你是一位專精於「認知負荷最小化」的硬核學科筆記專家。
+請將使用者提供的主題或教材，濃縮成適合在手機螢幕上 30 秒內讀完的「口袋記憶卡（Pocket Flashcard）」。
+請嚴格按照以下四個欄位輸出（使用 Markdown 格式），禁止長篇大論：
+1. 【一句話秒懂】：用不超過 40 字的大白話或比喻，講清楚這個概念在幹嘛。
+2. 【硬核定義與公式】：列出考試必背的精確定義、數學公式或判定條件（標註變數意義與單位）。
+3. 【秒殺判斷口訣】：濃縮成 1 到 2 句好記的推論法則。
+4. 【90% 的人會踩的坑】：點出最容易搞混的邊界條件、單位換算陷阱或相反概念。
+
+【數學公式排版規定】：
+- 若使用 LaTeX 數學公式（以 $ 包圍），裡面只放純英文變數、上下標與數學符號（例如 $AMAT = HitTime_1 + MissRate_1 \\times MissPenalty_1$），禁止在 $ 裡面使用 \\text{} 包裹中文字詞。`;
+
+      const data = await callGeminiWithFallback({
+        deskNum: 1,
+        fallbackModels: FALLBACK_LITE,
+        systemInstruction,
+        userPrompt: `請幫我製作以下主題的口袋記憶卡：\n${topic}`,
+        temperature: 0.2
+      });
+
+      const note = extractPartsText(data);
+      setDeskState(1, "done", "✅ 字卡完成！送交 2 號桌！");
+      return note;
+    }
+
+    async function runAgentExamForger(pocketNote, rejectFeedback = "") {
+      setDeskState(2, "working", rejectFeedback ? "💦 收到紅單！重修題目中..." : "😈 設計陷阱題並拆卷中...");
+      setBroadcast("😈 【2號桌 凱撒】正在根據口袋字卡設計研究所級陷阱題，並進行拆卷...");
+      appendLog("😈 [員工 2：出題官凱撒] 正在設計實戰陷阱題並拆卷...");
+
+      const systemInstruction = `
+你是一位專門命題專業科目與研究所考試的「魔鬼出題官」。
+請根據提供的【口袋記憶卡】，設計 2 道極具鑑別度的實戰題：
+- 第 1 題：觀念陷阱選擇題（單選 A/B/C/D）
+- 第 2 題：情境計算或邏輯推演選擇題（單選 A/B/C/D，需包含具體數值演算）
+
+【命題鐵則】
+1. 拒絕死背題：必須給出具體情境或數值，考驗公式活用與避坑能力。
+2. 誘答選項設計：3 個錯誤選項必須是根據「常見錯誤觀念」或「忘記換算單位」算出來的誘答值。
+3. 條件完備性：所有參數、單位（如 Byte vs Bit、ns vs ms、0-based vs 1-based）、邊界假設都必須在題幹中交代清楚。
+4. 嚴格拆卷：question_only 絕對不能包含任何答案暗示；author_solution 必須寫出完整推導算式。`;
+
+      let prompt = `【口袋記憶卡內容】\n${pocketNote}`;
+      if (rejectFeedback) {
+        prompt += `\n\n⚠️ 【糾察隊退件紅單警告】\n你上一版出的題目被驗算糾察隊退件了！請務必根據以下退件理由修正題目或詳解：\n${rejectFeedback}`;
+      }
+
+      const examSchema = {
+        type: "OBJECT",
+        properties: {
+          question_only: {
+            type: "STRING",
+            description: "【純題目卷】僅包含題號、完整題幹與選項 (A)(B)(C)(D)，絕對不可洩漏答案、提示或解析。"
+          },
+          author_solution: {
+            type: "STRING",
+            description: "【出題官解答卷】包含正確答案、逐步推導算式、以及每個誘答選項為什麼錯的詳細解析。"
+          }
+        },
+        required: ["question_only", "author_solution"]
+      };
+
+      const data = await callGeminiWithFallback({
+        deskNum: 2,
+        fallbackModels: FALLBACK_MAIN,
+        systemInstruction,
+        userPrompt: prompt,
+        temperature: 0.5,
+        responseSchema: examSchema
+      });
+
+      const parsed = JSON.parse(extractPartsText(data));
+      setDeskState(2, "done", "✅ 拆卷完成！送題目去盲測！");
+      return parsed;
+    }
+
+    async function runAgentBlindSolver(questionOnly) {
+      setDeskState(3, "working", "🕵️ 獨立解題 + Python 驗算中...");
+      setBroadcast("🕵️ 【3號桌 柯南】在看不到答案的隔離室中獨立解題，並執行 Python 驗算...");
+      appendLog("🕵️ [員工 3A：盲測員柯南] 正在獨立盲測解題並執行 Python 驗算...");
+
+      const systemInstruction = `
+你是一位嚴謹的理工科解題專家。現在你正在進行「盲測審題」。
+你手邊只有題目卷，沒有出題者的答案。請執行以下步驟：
+1. 仔細閱讀題幹的每一個條件與單位，若發現題幹條件不足或有歧義，請直接指出。
+2. 針對涉及數值計算、進制轉換、機率或演算法追蹤的題目，請務必使用內建的 Python 程式碼執行工具 (code_execution) 寫算式算出確切數字，禁止只靠心算。
+3. 明確列出你對第 1 題與第 2 題選出的最終答案（A/B/C/D）與完整推導過程。`;
+
+      const data = await callGeminiWithFallback({
+        deskNum: 3,
+        fallbackModels: FALLBACK_MAIN,
+        systemInstruction,
+        userPrompt: `請獨立解出以下試卷：\n\n${questionOnly}`,
+        temperature: 0.0,
+        useCodeExecution: true
+      });
+
+      const blindSol = extractPartsText(data);
+      setDeskState(3, "done", "✅ 盲測算完！交給包大人！");
+      return blindSol;
+    }
+
+    async function runAgentAuditor(pocketNote, examPaper, blindSolution) {
+      setDeskState(4, "working", "⚖️ 交叉比對兩邊答案與算式...");
+      setBroadcast("⚖️ 【4號桌 包大人】正在交叉審核「盲測算出的答案」與「出題官詳解」是否 100% 吻合...");
+      appendLog("⚖️ [員工 3B：糾察長包大人] 正在交叉審核盲測結果與出題官解答...");
+
+      const systemInstruction = `
+你是一位六親不認的「學科審題糾察隊長」。
+請比對【盲測獨立解題紀錄】與【出題官解答卷】，嚴格檢查以下三點：
+1. 兩邊算出的最終選項（A/B/C/D）與關鍵數值是否完全一致？
+2. 題幹是否有條件缺失、單位未標示、或兩個選項同時成立的瑕疵？
+3. 出題官的詳解推導是否完全符合【口袋記憶卡】中的正確定義？
+
+只要有任何一項不符，status 必須填寫 'REJECT'，並在 feedback_for_forger 中給出具體修改指令；
+唯有三項完全吻合且無瑕疵，status 才能填寫 'PASS'。`;
+
+      const prompt = `【參考基準：口袋記憶卡】\n${pocketNote}\n\n【純題目卷】\n${examPaper.question_only}\n\n【盲測獨立解題紀錄（含 Python 驗算）】\n${blindSolution}\n\n【出題官解答卷】\n${examPaper.author_solution}`;
+
+      const auditSchema = {
+        type: "OBJECT",
+        properties: {
+          status: { type: "STRING", enum: ["PASS", "REJECT"] },
+          consistency_check: { type: "STRING" },
+          rigor_check: { type: "STRING" },
+          feedback_for_forger: { type: "STRING" }
+        },
+        required: ["status", "consistency_check", "rigor_check", "feedback_for_forger"]
+      };
+
+      const data = await callGeminiWithFallback({
+        deskNum: 4,
+        fallbackModels: FALLBACK_MAIN,
+        systemInstruction,
+        userPrompt: prompt,
+        temperature: 0.0,
+        responseSchema: auditSchema
+      });
+
+      return JSON.parse(extractPartsText(data));
+    }
+
+    // =====================================================================
+    // 6. 主工作流與歷史紀錄管理
+    // =====================================================================
+    async function publishAndStartTask() {
+      if (isRunning) return;
+
+      const apiKey = document.getElementById("api-key-input").value.trim();
+      if (!apiKey) {
+        alert("請先在右上角貼上你的 Gemini API Key 並按下「儲存」！");
+        document.getElementById("api-key-input").focus();
+        return;
+      }
+      localStorage.setItem("POCKET_COMPANY_GEMINI_KEY", apiKey);
+
+      const topic = document.getElementById("topic-input").value.trim();
+      if (!topic) {
+        alert("請輸入你想學習的 STUDY_TOPIC 內容！");
+        return;
+      }
+
+      document.getElementById("active-study-topic").textContent = topic;
+      appendLog(`📢 [董事長發佈新任務] STUDY_TOPIC：「${topic}」`);
+
+      isRunning = true;
+      const btn = document.getElementById("publish-btn");
+      btn.disabled = true;
+      btn.classList.add("opacity-60", "cursor-not-allowed");
+
+      setDeskState(1, "idle", "📝 收到老闆任務！");
+      setDeskState(2, "idle", "😈 待命準備出題...");
+      setDeskState(3, "idle", "🕵️ 隔離待命中...");
+      setDeskState(4, "idle", "⚖️ 待命準備審核...");
+      document.getElementById("result-section").classList.add("hidden");
+
+      let pocketNote = "（尚未生成）";
+      let finalExam = { question_only: "（尚未生成）", author_solution: "（尚未生成）" };
+      let finalBlindSolution = "（尚未生成）";
+      let finalAudit = {
+        status: "REJECT",
+        consistency_check: "尚未完成審核",
+        rigor_check: "尚未完成審核",
+        feedback_for_forger: "中途發生異常或尚未完成"
+      };
+      let isVerified = false;
+
+      try {
+        document.getElementById("round-indicator").textContent = "Step 1：提煉字卡";
+        pocketNote = await runAgentDistiller(topic);
+
+        setBroadcast("🏃‍♂️ 小米做好了【口袋記憶卡】，正走路拿去 2 號桌交給出題官凱撒！");
+        await walkAndDeliver(1, 2, "📒 移交：口袋記憶卡");
+
+        let rejectFeedback = "";
+        for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
+          document.getElementById("round-indicator").textContent = `審題第 ${attempt}/${MAX_RETRIES + 1} 輪`;
+
+          finalExam = await runAgentExamForger(pocketNote, rejectFeedback);
+
+          setBroadcast("🏃‍♂️ 凱撒出完題了！正在把【純題目卷（無答案）】送去 3 號桌給柯南！");
+          await walkAndDeliver(2, 3, "📄 移交：純題目卷");
+
+          finalBlindSolution = await runAgentBlindSolver(finalExam.question_only);
+
+          setBroadcast("🏃‍♂️ 柯南用 Python 驗算完畢！正在把【盲測紀錄】送到 4 號桌給包大人！");
+          await walkAndDeliver(3, 4, "🐍 移交：Python 驗算卷");
+
+          finalAudit = await runAgentAuditor(pocketNote, finalExam, finalBlindSolution);
+
+          if (finalAudit.status === "PASS") {
+            isVerified = true;
+            setDeskState(4, "done", "🎉 雙重查核 100% 通過！");
+            setBroadcast("🎉 【雙重查核通過！】包大人簽核完畢，已呈交至下方董事長辦公桌！");
+            appendLog(`🎉 [審核通過 PASS] ${finalAudit.consistency_check}`);
+            break;
+          } else {
+            setDeskState(4, "reject", "🚨 發現瑕疵！退件重修！");
+            rejectFeedback = finalAudit.feedback_for_forger;
+            appendLog(`🚨 [觸發退件紅單 REJECT] 原因：${rejectFeedback}`);
+
+            if (attempt <= MAX_RETRIES) {
+              setBroadcast("🚨 包大人抓到題目瑕疵！舉著【退件紅單】走回 2 號桌要求凱撒重修！");
+              await walkAndDeliver(4, 2, "🚨 退件紅單：退回 2 號桌！", true);
+            } else {
+              setBroadcast("⚠️ 已達最大退件上限，為保護免費 API 額度，停止重修並輸出報告。");
+            }
+          }
+        }
+      } catch (err) {
+        appendLog(`💥 [異常保護觸發] ${err.message}`);
+        setBroadcast(`⚠️ 執行中途發生錯誤（${err.message}），已啟動斷點保護保留目前進度！`);
+      } finally {
+        const record = {
+          id: Date.now(),
+          time: new Date().toLocaleString(),
+          topic,
+          pocketNote,
+          finalExam,
+          finalBlindSolution,
+          finalAudit,
+          isVerified
+        };
+        saveToHistory(record);
+        renderFinalOutput(record);
+
+        isRunning = false;
+        btn.disabled = false;
+        btn.classList.remove("opacity-60", "cursor-not-allowed");
+        document.getElementById("round-indicator").textContent = isVerified ? "✅ 已簽核結案" : "⚠️ 需人工複查";
+      }
+    }
+
+    function renderFinalOutput(record) {
+      const { topic, pocketNote, finalExam, finalBlindSolution, finalAudit, isVerified } = record;
+      const section = document.getElementById("result-section");
+      section.classList.remove("hidden");
+
+      const badge = document.getElementById("final-status-badge");
+      if (isVerified) {
+        badge.textContent = "✅ 雙重盲測驗算通過 (PASS)";
+        badge.className = "text-xs px-2.5 py-0.5 rounded-full font-black border-2 bg-emerald-100 text-emerald-900 border-emerald-600";
+      } else {
+        badge.textContent = "⚠️ 需人工複查 (NEEDS REVIEW)";
+        badge.className = "text-xs px-2.5 py-0.5 rounded-full font-black border-2 bg-amber-100 text-amber-900 border-amber-600";
+      }
+
+      // 使用支援 KaTeX 的渲染函式
+      renderMarkdownWithMath("output-pocket-note", pocketNote);
+      renderMarkdownWithMath("output-question-only", finalExam.question_only);
+      renderMarkdownWithMath("output-author-solution", finalExam.author_solution);
+      renderMarkdownWithMath("output-blind-solution", finalBlindSolution);
+
+      document.getElementById("audit-consistency").textContent = finalAudit.consistency_check;
+      document.getElementById("audit-rigor").textContent = finalAudit.rigor_check;
+      document.getElementById("audit-feedback").textContent = finalAudit.feedback_for_forger;
+
+      document.getElementById("solution-drawer").classList.add("hidden");
+      document.getElementById("toggle-solution-btn").textContent = "👁️ 揭曉雙重認證詳解與驗算紀錄";
+
+      const statusText = isVerified ? "✅ 雙重盲測驗算通過 (PASS)" : "⚠️ 需人工複查 (NEEDS REVIEW)";
+      latestMarkdownContent = `# 📚 口袋記憶卡與雙重查核題庫：${topic}\n\n> **審核狀態**：${statusText}\n\n---\n\n## 一、口袋記憶卡\n\n${pocketNote}\n\n---\n\n## 二、實戰陷阱題\n\n${finalExam.question_only}\n\n---\n\n## 三、雙重認證詳解與驗算紀錄\n\n### 1. 出題官標準詳解\n${finalExam.author_solution}\n\n### 2. 鐵面糾察隊獨立盲測與 Python 驗算紀錄\n${finalBlindSolution}\n\n### 3. 審核簽核報告\n- **答案一致性**：${finalAudit.consistency_check}\n- **題幹嚴謹度**：${finalAudit.rigor_check}\n- **審核總結**：${finalAudit.feedback_for_forger}\n`;
+
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    // 歷史字卡存取 (LocalStorage)
+    function saveToHistory(record) {
+      if (record.pocketNote === "（尚未生成）") return;
+      const list = JSON.parse(localStorage.getItem("POCKET_COMPANY_HISTORY") || "[]");
+      list.unshift(record);
+      localStorage.setItem("POCKET_COMPANY_HISTORY", JSON.stringify(list.slice(0, 15)));
+      renderHistoryList();
+    }
+
+    function renderHistoryList() {
+      const container = document.getElementById("history-list");
+      const list = JSON.parse(localStorage.getItem("POCKET_COMPANY_HISTORY") || "[]");
+      if (!list.length) {
+        container.innerHTML = `<span class="text-stone-400">尚未有歷史字卡紀錄，發佈任務完成後會自動保存在這裡！</span>`;
+        return;
+      }
+      container.innerHTML = "";
+      list.forEach((item, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "bg-amber-50 hover:bg-amber-100 text-stone-800 border-2 border-stone-700 rounded-xl px-3 py-1.5 font-bold text-xs transition text-left max-w-xs truncate";
+        const icon = item.isVerified ? "✅" : "⚠️";
+        btn.textContent = `${icon} #${list.length - idx} ${item.topic.slice(0, 22)}...`;
+        btn.onclick = () => {
+          document.getElementById("active-study-topic").textContent = item.topic;
+          renderFinalOutput(item);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function clearHistory() {
+      if (!confirm("確定要清空手機裡的歷史字卡紀錄嗎？")) return;
+      localStorage.removeItem("POCKET_COMPANY_HISTORY");
+      renderHistoryList();
+    }
+
+    function toggleSolution() {
+      const drawer = document.getElementById("solution-drawer");
+      const btn = document.getElementById("toggle-solution-btn");
+      if (drawer.classList.contains("hidden")) {
+        drawer.classList.remove("hidden");
+        btn.textContent = "🙈 隱藏詳解（重新遮住答案）";
+      } else {
+        drawer.classList.add("hidden");
+        btn.textContent = "👁️ 揭曉雙重認證詳解與驗算紀錄";
+      }
+    }
+
+    function downloadMarkdown() {
+      if (!latestMarkdownContent) return;
+      const blob = new Blob([latestMarkdownContent], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "verified_pocket_note.md";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function copyMarkdown() {
+      if (!latestMarkdownContent) return;
+      navigator.clipboard.writeText(latestMarkdownContent).then(() => {
+        alert("✅ 已將完整 Markdown 筆記與題庫複製到剪貼簿！");
+      });
+    }
+  </script>
+</body>
+</html>
